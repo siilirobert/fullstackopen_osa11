@@ -1,0 +1,69 @@
+name: Deployment pipeline
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  simple_deployment_pipeline:
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+      - name: Install backend dependencies
+        run: npm install
+      - name: Install frontend dependencies
+        run: cd frontend/ && npm install
+#      - name: Check style
+#        run: npm run eslint
+#      - name: Do production build
+#        run: npm run build
+#      - name: Run tests
+#        run: npm test
+#      - name: Run e2e tests
+#        uses: cypress-io/github-action@v5
+#        with:
+#          command: npm run test:e2e
+#          start: npm run start-prod
+#          wait-on: http://localhost:5000
+#      - name: Deploy
+#        if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)),'#skip') }}
+#        uses: JorgeLNJunior/render-deploy@v1.3.2
+#        with:
+#          api_key: ${{ secrets.RENDER_API_KEY }}
+#          service_id: ${{ secrets.RENDER_SERVICE_ID }}
+#      - name: Discord webhook success
+#        uses: rjstone/discord-webhook-notify@v1
+#        if: success()
+#        with:
+#            severity: info
+#            username: SiiliRobert
+#            text: New version!
+#            description: A new version of pokedex has been deployed to https://pokedex-ktrz.onrender.com/ by ${{ github.event.commits[0].committer.username }}
+#            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+#      - name: Discord webhook fail
+#        uses: rjstone/discord-webhook-notify@v1
+#        if: failure()
+#        with:
+#            severity: error
+#            username: SiiliRobert
+#            text: Build failed!
+#            description: The commit ${{ github.event.commits[0].url }} by ${{ github.event.commits[0].committer.username }} broke something
+#            webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+#  tag_release:
+#    needs: [simple_deployment_pipeline]
+#    runs-on: ubuntu-20.04
+#    steps:
+#      - uses: actions/checkout@v3
+#      - name: Bump version and push tag
+#        if: ${{ github.event_name == 'push' && !contains(join(toJson(github.event.commits.*.message)),'#skip') }}
+#        uses: anothrNick/github-tag-action@1.62.0
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          DEFAULT_BUMP: patch
